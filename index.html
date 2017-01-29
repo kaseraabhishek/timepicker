@@ -1,0 +1,23 @@
+<link rel="stylesheet" type="text/css" href="timepicker.css">
+<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="timepicker.js"></script>
+<div class='text-center'>
+	<input name='a' type='text' class='timepicker start'>
+	<input name='b' type='text' class='timepicker end'>
+</div>
+<script type="text/javascript">
+$(function() {
+	$timeStart = $(".timepicker.start").timepicker({
+		'startTime' : '9:00 am',
+		'endTime' : '9:00 pm',
+		'duration' : '60',
+		'maxTime' : '7:00 pm',
+	});
+	$timeEnd = $(".timepicker.end").timepicker({
+		//'minTime' : $timeStart.val(),
+		'startTime' : '9:00 am',
+		'endTime' : '9:00 pm',
+		'duration' : '60',
+	});
+})
+</script>
