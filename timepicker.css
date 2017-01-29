@@ -1,0 +1,41 @@
+body {
+	background-color: #ddd;
+}
+.timepicker {
+	padding: 10px 15px;
+	border-color: #fff;
+	border-left: 5px  solid #00ACED;
+	box-shadow: none;
+	outline: none;
+}
+.text-center {
+	text-align: center;
+}
+.fixed {
+	position: fixed;
+}
+.time-list {
+	border: 1px  solid #f0f0f0;
+	color: gray;
+	background-color: #fff;
+	max-height: 500px;
+    overflow-y: scroll;
+}
+.time-list div {
+	padding: 10px 15px;
+	border-left: 5px  solid #00ACED;
+}
+.time-list div.disable {
+	background: #333 none repeat scroll 0 0;
+    opacity: 0.4;
+}
+.time-list div:nth-child(odd) {
+	border-left: 5px  solid #4183C4;
+}
+.time-list div:hover {
+    background-color: #00ACED;
+    color: #fff;
+}
+.time-list div:nth-child(odd):hover {
+	border-left: 5px  solid #4183C4;
+}
