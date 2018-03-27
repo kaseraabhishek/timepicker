@@ -25,7 +25,8 @@ $(function() {
 			hrs = hrs - 12;
 			ampm = 'pm';
 		}
-		if(mins == 0) {
+		
+		if(mins < 10) {
 			mins = "0" + mins;
 		}
 		return hrs + ":" + mins + " " + ampm;
@@ -38,93 +39,81 @@ $(function() {
 		return d;
 	}
 
-	$.fn.timepicker = function(options) {
-		var defaultOption = {
-			startTime : '8:00 am',
-			endTime : '8:00 pm',
-			duration : 30,
-		}
-		var self = this;
-		var date = new Date();
-		var settings = $.extend(defaultOption, options);
-		var startHrMin = getHrMin(settings.startTime);
-		var startDate = new Date();
-
-		startDate.setHours(startHrMin[0], startHrMin[1], 0, 0);
-		var endHrMin = getHrMin(settings.endTime);
-		var endDate = new Date();
-		endDate.setHours(endHrMin[0], endHrMin[1], 0, 0);
-
-		var minTime = settings.minTime;
-		var maxTime = settings.maxTime;
-
-		var diffMs = (endDate - startDate);
-		var diffMins = diffMs / 60000; // minutes
-		var slotCount = diffMins / settings.duration;
-
-		var $div = $("<div></div>");
-		var $span = $("<span></span>");
-		var $iTag = $("<iTag></iTag>");
-		var $timeList = $div.clone();
-		
-		$(document).on('click',function(e) {
-			$target = $(e.target);
-			if(!$target.hasClass('timepicker') && $target.parents('.time-list').length == 0) {
-				$('.time-list').remove();
+	Timepicker = {
+		settings : {},
+		init: function(options, elem) {
+		    var defaultOption = {
+				startTime : '8:00 am',
+				endTime : '8:00 pm',
+				duration : 30,
 			}
-		})
+			this.settings = $.extend({},defaultOption,options);
+			this.element  = elem;
+			this.$element = $(elem);
+			this.setListeners();
+	        this.minTime = this.settings.minTime;
+	        this.maxTime = this.settings.maxTime;
+			var self = this;
+			var date = new Date();
+			var startHrMin = getHrMin(this.settings.startTime);
+			var startDate = new Date();
 
-		self.setMinTime = function(minTime) {
-			settings.minTime = minTime;
-		}
-		
-		self.each(function() {
-			$this = $(this);
+			startDate.setHours(startHrMin[0], startHrMin[1], 0, 0);
+			var endHrMin = getHrMin(this.settings.endTime);
+			var endDate = new Date();
+			endDate.setHours(endHrMin[0], endHrMin[1], 0, 0);
 
-			Timepicker = {
-                element: $this,
-                minTime: settings.minTime,
-                maxTime: settings.maxTime,
-                // step 3
-                setMinTime: function(){
-                	console.log('mintime');
-                }, 
-                generateHtml : function() {
-					$('body').find('.time-list').remove();
-					$('body').find('.time-list').hide();
-					$timeList = $div.clone().addClass('time-list').css({'display':'none','position':'fixed'});
-					var minDate = minTime ? getDatefromTimeString(minTime) : null;
-					var maxDate = maxTime ? getDatefromTimeString(maxTime) : null;
-					for(i=0;i<slotCount; i++) {
-						var minutes = i * settings.duration;
-						var timeString = getTimeString(startDate, minutes);
-						var $timeListItem = $div.clone().html(timeString);
-						var date = getDatefromTimeString(timeString);
-						if((minDate && date <= minDate) || (maxDate && date >= maxDate)) {
-							$timeListItem.addClass('disable');
-						}
-						$timeList.append($timeListItem);
-					}
-					$('body').append($timeList);
-					return $timeList;
-				},
-				setPosition : function(current, tList) {
-					var $inputOffset = current.offset();
-					var inputInnerHeight = current.innerHeight();
-					var outerHeight = current.outerHeight();
-					var width = current.outerWidth();
-					var height = outerHeight > inputInnerHeight ? outerHeight : inputInnerHeight;
-					var left = $inputOffset.left;
-					var top = $inputOffset.top + height;
-					tList.offset({left:left, top:top});
-					tList.css({'min-width':width+'px'});
+			var diffMs = (endDate - startDate);
+			var diffMins = diffMs / 60000; // minutes
+			this.settings.slotCount = diffMins / this.settings.duration;
+			return this;
+		}, 
+        generateHtml : function() {
+        	var $div = $("<div></div>");
+			var $span = $("<span></span>");
+			var $iTag = $("<iTag></iTag>");
+			var $timeList = $div.clone();
+			$('body').find('.time-list').remove();
+			$('body').find('.time-list').hide();
+			$timeList = $div.clone().addClass('time-list').css({'display':'none','position':'fixed'});
+			var minDate = this.minTime ? getDatefromTimeString(this.minTime) : null;
+			var maxDate = this.maxTime ? getDatefromTimeString(this.maxTime) : null;
+			var slotCount = this.settings.slotCount;
+			var startHrMin = getHrMin(this.settings.startTime);
+			var startDate = new Date();
+			startDate.setHours(startHrMin[0], startHrMin[1], 0, 0);
+			for(i=0;i<slotCount; i++) {
+				var minutes = i * this.settings.duration;
+				var timeString = getTimeString(startDate, minutes);
+				var $timeListItem = $div.clone().html(timeString);
+				var date = getDatefromTimeString(timeString);
+				if((minDate && date <= minDate) || (maxDate && date >= maxDate)) {
+					$timeListItem.addClass('disable');
 				}
-            };
-			$this.click(function() {
+				$timeList.append($timeListItem);
+			}
+			$('body').append($timeList);
+			return $timeList;
+		},
+		setPosition : function(current, tList) {
+			var $inputOffset = current.offset();
+			var inputInnerHeight = current.innerHeight();
+			var outerHeight = current.outerHeight();
+			var width = current.outerWidth();
+			var height = outerHeight > inputInnerHeight ? outerHeight : inputInnerHeight;
+			var left = $inputOffset.left;
+			var top = $inputOffset.top + height;
+			tList.offset({left:left, top:top});
+			tList.css({'min-width':width+'px'});
+		},
+
+		setListeners:function (){
+			var self=this;
+			this.$element.on('click',function (){
 				var $currentEle = $(this);
-				var $timeList = Timepicker.generateHtml($(this));
+				var $timeList = self.generateHtml($currentEle);
 				$timeList.show();
-				Timepicker.setPosition($(this), $timeList);
+				self.setPosition($(this), $timeList);
 
 				$timeList.find('div').click(function() {
 					$timeItem = $(this);
@@ -134,12 +123,66 @@ $(function() {
 					var time = $timeItem.text()
 					$currentEle.val(time);
 					$timeList.remove();
+					$currentEle.change();
 					return false;
 				})
-				return false;
-			})
-		});
+			});
+		},
 
-		return self;
+		setMinTime : function(minTime) {
+			this.settings.minTime = minTime;
+		},
+    };
+
+    /*Timepicker.prototype = {
+        constructor: Timepicker,   
+    }*/
+
+	$.fn.timepicker = function(options) {
+		this.setMinTime = function(time) {
+			options.minTime = time;
+			var timepicker = Object.create(Timepicker);
+			timepicker.init(options, this);
+		}
+
+		this.setMaxTime = function(time) {
+			options.maxTime = time;
+			var timepicker = Object.create(Timepicker);
+			timepicker.init(options, this);
+		}
+
+		this.setStartTime = function(time) {
+			options.startTime = time;
+			var timepicker = Object.create(Timepicker);
+			timepicker.init(options, this);
+		}
+
+		this.setEndTime = function(time) {
+			options.endTime = time;
+			var timepicker = Object.create(Timepicker);
+			timepicker.init(options, this);
+		}
+
+		this.setDuration = function(duration) {
+			options.duration = duration;
+			var timepicker = Object.create(Timepicker);
+			timepicker.init(options, this);
+		}
+
+
+		$(document).on('click',function(e) {
+			$target = $(e.target);
+			if(!$target.hasClass('timepicker') && $target.parents('.time-list').length == 0) {
+				$('.time-list').remove();
+			}
+		})
+		if ( this.length ) {
+			return this.each(function(){
+				var timepicker = Object.create(Timepicker);
+				timepicker.init(options, this);
+			});
+	    }
+		
 	};
-})
+
+});
