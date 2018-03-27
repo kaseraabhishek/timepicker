@@ -10,14 +10,19 @@ $(function() {
 	$timeStart = $(".timepicker.start").timepicker({
 		'startTime' : '9:00 am',
 		'endTime' : '9:00 pm',
-		'duration' : '60',
+		'duration' : '30',
 		'maxTime' : '7:00 pm',
+	}).on('change ',function(e) {
+		$timeEnd.setMinTime($(this).val());
 	});
+	
 	$timeEnd = $(".timepicker.end").timepicker({
-		//'minTime' : $timeStart.val(),
+		'minTime' : $timeStart.val(),
 		'startTime' : '9:00 am',
 		'endTime' : '9:00 pm',
-		'duration' : '60',
-	});
+		'duration' : '30',
+	}).on('change ',function(e) {
+		$timeStart.setMaxTime($(this).val());
+	});;
 })
 </script>
